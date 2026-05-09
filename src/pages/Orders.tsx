@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Loader2, AlertTriangle, RefreshCcw, ShoppingBag, User, MapPin, ExternalLink } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Loader2, AlertTriangle, RefreshCcw, User, ExternalLink } from 'lucide-react';
 import api from '../lib/api';
 
 const statusColors: any = {

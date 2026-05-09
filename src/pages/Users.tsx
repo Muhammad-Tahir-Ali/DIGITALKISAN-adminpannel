@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { 
-  Users as UsersIcon, 
   Search, 
-  Mail, 
   ShieldCheck, 
   UserPlus,
   Loader2,

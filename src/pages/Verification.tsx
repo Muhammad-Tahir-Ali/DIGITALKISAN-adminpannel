@@ -43,7 +43,7 @@ export default function Verification() {
     });
   }, [users, search, activeFilter]);
 
-  const updateStatus = async (id: string, isVerified: boolean) => {
+  const updateStatus = async (id: string) => {
     try {
       const res = await api.patch(`/admin/users/${id}/verify`);
       const updatedUser = res.data.data.user;
@@ -149,7 +149,7 @@ export default function Verification() {
                           <Eye className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => updateStatus(user._id, !user.isVerified)}
+                          onClick={() => updateStatus(user._id)}
                           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black transition-all ${
                             user.isVerified ? 'bg-rose-50 text-rose-700 hover:bg-rose-100' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
                           }`}
@@ -194,7 +194,7 @@ export default function Verification() {
             </div>
             <div className="flex gap-3">
               <button
-                onClick={() => updateStatus(selectedUser._id, !selectedUser.isVerified)}
+                onClick={() => updateStatus(selectedUser._id)}
                 className={`flex-1 py-3 text-white rounded-xl font-bold text-sm transition-colors ${
                   selectedUser.isVerified ? 'bg-rose-600 hover:bg-rose-700' : 'bg-emerald-600 hover:bg-emerald-700'
                 }`}

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Filter, Trash2, Edit3, Loader2, AlertTriangle, RefreshCcw, Package, Tag, User } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Search, Trash2, Loader2, AlertTriangle, RefreshCcw, Package } from 'lucide-react';
 import api from '../lib/api';
 
 export default function Products() {

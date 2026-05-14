@@ -27,6 +27,7 @@ interface DashboardData {
 
 export default function Dashboard() {
   const [loading, setLoading] = useState(true);
+  const [slowStart, setSlowStart] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<DashboardData | null>(null);
 
@@ -34,13 +35,19 @@ export default function Dashboard() {
     try {
       setLoading(true);
       setError(null);
+      setSlowStart(false);
+      // Show "waking up" banner after 4s (before the retry kicks in at 5s)
+      const wakeTimer = setTimeout(() => setSlowStart(true), 4000);
       const response = await api.get('/admin/stats');
+      clearTimeout(wakeTimer);
+      setSlowStart(false);
       setData(response.data.data);
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
-      setError(error.response?.data?.message || 'Failed to fetch dashboard stats');
+      setError(error.response?.data?.message || 'Failed to reach server. The backend may be starting up — please retry in a few seconds.');
     } finally {
       setLoading(false);
+      setSlowStart(false);
     }
   };
 
@@ -69,8 +76,14 @@ export default function Dashboard() {
 
   if (loading || !data) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500" />
+        {slowStart && (
+          <div className="flex items-center gap-2 px-5 py-3 bg-amber-50 border border-amber-200 rounded-2xl">
+            <Clock className="w-4 h-4 text-amber-500 flex-shrink-0" />
+            <p className="text-amber-700 text-sm font-medium">Server is waking up on Render free tier — this takes ~30 seconds on first load.</p>
+          </div>
+        )}
       </div>
     );
   }

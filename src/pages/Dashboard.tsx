@@ -45,7 +45,9 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    setTimeout(() => fetchDashboard(), 0);
+    fetchDashboard();
+    const interval = setInterval(() => fetchDashboard(), 30000);
+    return () => clearInterval(interval);
   }, []);
 
   if (loading || !data) {

@@ -39,6 +39,8 @@ export default function Orders() {
   }, [fetchOrders]);
 
   const updateStatus = async (id: string, newStatus: string) => {
+    const confirmed = window.confirm(`Change order status to "${newStatus}"?`);
+    if (!confirmed) return;
     try {
       await api.patch(`/admin/orders/${id}/status`, { status: newStatus });
       setOrders(prev => prev.map(o => o._id === id ? { ...o, status: newStatus } : o));

@@ -5,7 +5,7 @@ import api from '../lib/api';
 type TabFilter = 'All' | 'held_in_escrow' | 'released' | 'disputed' | 'refunded';
 
 export default function Transactions() {
-  const [orders, setOrders] = useState<any[]>([]);
+  const [orders, setOrders] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -17,8 +17,9 @@ export default function Transactions() {
       setError(null);
       const res = await api.get('/admin/transactions');
       setOrders(res.data.data.transactions);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to fetch transaction data');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || 'Failed to fetch transaction data');
     } finally {
       setLoading(false);
     }
@@ -34,7 +35,7 @@ export default function Transactions() {
       const matchesSearch =
         tx._id.toLowerCase().includes(q) ||
         tx.payer?.name.toLowerCase().includes(q) ||
-        tx.payees?.some((p: any) => p.user?.name.toLowerCase().includes(q));
+        tx.payees?.some((p: { user?: { name: string } }) => p.user?.name.toLowerCase().includes(q));
       const matchesTab = activeTab === 'All' || tx.status === activeTab;
       return matchesSearch && matchesTab;
     });

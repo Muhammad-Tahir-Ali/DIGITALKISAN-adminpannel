@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
   Search, 
   ShieldCheck, 
@@ -26,6 +26,13 @@ interface User {
   createdAt: string;
 }
 
+const ROLE_COLORS: Record<string, string> = {
+  admin: 'bg-zinc-900 text-emerald-400',
+  farmer: 'bg-emerald-100 text-emerald-700',
+  buyer: 'bg-blue-100 text-blue-700',
+  logistics: 'bg-amber-100 text-amber-700',
+};
+
 export default function Users() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -43,7 +50,7 @@ export default function Users() {
     phone: ''
   });
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -54,26 +61,28 @@ export default function Users() {
         }
       });
       setUsers(res.data.data.users);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to fetch users');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || 'Failed to fetch users');
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchQuery, roleFilter]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchUsers();
     }, 500);
     return () => clearTimeout(timer);
-  }, [searchQuery, roleFilter]);
+  }, [fetchUsers]);
 
   const toggleVerify = async (id: string) => {
     try {
       const res = await api.patch(`/admin/users/${id}/verify`);
       setUsers(prev => prev.map(u => u._id === id ? res.data.data.user : u));
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to update verification');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      alert(error.response?.data?.message || 'Failed to update verification');
     }
   };
 
@@ -82,8 +91,9 @@ export default function Users() {
     try {
       const res = await api.patch(`/admin/users/${id}/suspend`);
       setUsers(prev => prev.map(u => u._id === id ? res.data.data.user : u));
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to update suspension');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      alert(error.response?.data?.message || 'Failed to update suspension');
     }
   };
 
@@ -92,8 +102,9 @@ export default function Users() {
     try {
       await api.delete(`/admin/users/${id}`);
       setUsers(prev => prev.filter(u => u._id !== id));
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to delete user');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      alert(error.response?.data?.message || 'Failed to delete user');
     }
   };
 
@@ -105,8 +116,9 @@ export default function Users() {
       setShowCreateModal(false);
       setFormData({ name: '', email: '', password: '', phone: '' });
       fetchUsers();
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to create admin');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      alert(error.response?.data?.message || 'Failed to create admin');
     } finally {
       setCreating(false);
     }
@@ -192,12 +204,7 @@ export default function Users() {
                   <tr key={user._id} className="hover:bg-slate-50/50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-black ${
-                          user.role === 'admin' ? 'bg-zinc-900 text-emerald-400' :
-                          user.role === 'farmer' ? 'bg-emerald-100 text-emerald-700' :
-                          user.role === 'buyer' ? 'bg-blue-100 text-blue-700' :
-                          'bg-amber-100 text-amber-700'
-                        }`}>
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-black ${ROLE_COLORS[user.role] ?? 'bg-gray-100 text-gray-700'}`}>
                           {user.name[0]}
                         </div>
                         <div>

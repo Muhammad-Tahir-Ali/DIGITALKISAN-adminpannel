@@ -1,16 +1,26 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Search, CheckCircle, Clock, UserCheck, UserX, Eye, AlertTriangle, RefreshCcw, Loader2 } from 'lucide-react';
+import { Search, CheckCircle, Clock, UserCheck, UserX, Eye, AlertTriangle, Loader2 } from 'lucide-react';
 import api from '../lib/api';
+
+interface User {
+  _id: string;
+  name: string;
+  email: string;
+  role: string;
+  isVerified: boolean;
+  phone?: string;
+  createdAt: string;
+}
 
 type StatusFilter = 'All' | 'Pending' | 'Verified';
 
 export default function Verification() {
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [activeFilter, setActiveFilter] = useState<StatusFilter>('All');
-  const [selectedUser, setSelectedUser] = useState<any | null>(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   const fetchUsers = async () => {
     try {
@@ -19,8 +29,9 @@ export default function Verification() {
       // Fetch farmers specifically
       const response = await api.get('/admin/users', { params: { role: 'farmer' } });
       setUsers(response.data.data.users);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to fetch verification list');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || 'Failed to fetch verification list');
     } finally {
       setLoading(false);
     }
@@ -49,10 +60,11 @@ export default function Verification() {
       const updatedUser = res.data.data.user;
       setUsers(prev => prev.map(u => u._id === id ? updatedUser : u));
       if (selectedUser?._id === id) setSelectedUser(updatedUser);
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to update verification status');
+    } catch (err: unknown) {
+      const _err = err as { response?: { data?: { message?: string } } };
+      alert(_err.response?.data?.message || 'Failed to update verification status');
     }
-  };
+    };
 
   if (loading) {
     return (
@@ -209,4 +221,3 @@ export default function Verification() {
     </div>
   );
 }
-

@@ -133,12 +133,16 @@ export default function Products() {
                         className={`text-[10px] font-black uppercase px-2 py-1 rounded-lg outline-none border-none cursor-pointer ${
                           product.status === 'active' ? 'bg-emerald-100 text-emerald-700' :
                           product.status === 'sold_out' ? 'bg-amber-100 text-amber-700' :
+                          product.status === 'pending_ai' ? 'bg-violet-100 text-violet-700' :
+                          product.status === 'rejected' ? 'bg-rose-100 text-rose-700' :
                           'bg-zinc-100 text-zinc-500'
                         }`}
                       >
                         <option value="active">Active</option>
                         <option value="hidden">Hidden</option>
                         <option value="sold_out">Sold Out</option>
+                        <option value="pending_ai">Pending Review</option>
+                        <option value="rejected">Rejected</option>
                       </select>
                     </td>
                     <td className="px-8 py-5 text-right">

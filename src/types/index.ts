@@ -73,8 +73,15 @@ export interface Verification {
 
 export interface Withdrawal {
   _id: string;
-  user?: { name: string };
+  user?: { name: string; role?: string };
   amount: number;
+  method: string;
+  accountDetails?: {
+    accountTitle?: string;
+    accountNumber?: string;
+    bankName?: string;
+  };
+  adminNotes?: string;
   status: string;
   createdAt: string;
   [key: string]: unknown;

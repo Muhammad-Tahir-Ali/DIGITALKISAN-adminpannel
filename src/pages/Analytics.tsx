@@ -67,14 +67,6 @@ export default function Analytics() {
     setTimeout(() => fetchAnalytics(), 0);
   }, []);
 
-  if (loading || !data) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="w-10 h-10 text-emerald-500 animate-spin" />
-      </div>
-    );
-  }
-
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
@@ -82,6 +74,14 @@ export default function Analytics() {
         <h2 className="text-xl font-bold text-slate-900">Analytics Error</h2>
         <p className="text-slate-500 mt-1">{error}</p>
         <button onClick={fetchAnalytics} className="mt-6 flex items-center gap-2 px-6 py-2.5 bg-zinc-900 text-white rounded-xl font-bold"><RefreshCcw className="w-4 h-4" /> Retry</button>
+      </div>
+    );
+  }
+
+  if (loading || !data) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-10 h-10 text-emerald-500 animate-spin" />
       </div>
     );
   }

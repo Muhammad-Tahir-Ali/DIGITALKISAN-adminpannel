@@ -50,14 +50,6 @@ export default function Dashboard() {
     return () => clearInterval(interval);
   }, []);
 
-  if (loading || !data) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
-      </div>
-    );
-  }
-
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
@@ -71,6 +63,14 @@ export default function Dashboard() {
           <RefreshCcw className="w-4 h-4" />
           Retry Loading
         </button>
+      </div>
+    );
+  }
+
+  if (loading || !data) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
       </div>
     );
   }

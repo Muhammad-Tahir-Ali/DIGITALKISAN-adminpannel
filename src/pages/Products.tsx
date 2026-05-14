@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Search, Trash2, Loader2, AlertTriangle, RefreshCcw, Package } from 'lucide-react';
 import api from '../lib/api';
-import { Product } from '../types';
+import type { Product } from '../types';
 
 export default function Products() {
   const [products, setProducts] = useState<Product[]>([]);

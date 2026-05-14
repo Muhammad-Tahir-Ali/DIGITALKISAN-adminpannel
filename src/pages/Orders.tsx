@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Loader2, AlertTriangle, User, ExternalLink } from 'lucide-react';
+import { Loader2, AlertTriangle, User } from 'lucide-react';
 import api from '../lib/api';
-import { Order } from '../types';
+import type { Order } from '../types';
 
 const statusColors: Record<string, string> = {
   pending: 'bg-amber-100 text-amber-700',
@@ -130,9 +130,9 @@ export default function Orders() {
                       </select>
                     </td>
                     <td className="px-8 py-5 text-right">
-                      <button className="p-2 text-zinc-300 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all">
-                        <ExternalLink className="w-4 h-4" />
-                      </button>
+                      <span className="text-[10px] font-bold text-zinc-300 italic">
+                        {new Date(order.createdAt).toLocaleDateString('en-PK')}
+                      </span>
                     </td>
                   </tr>
                 ))

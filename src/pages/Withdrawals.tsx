@@ -44,8 +44,8 @@ export default function Withdrawals() {
     }
   };
 
-  const filtered = withdrawals.filter(w => 
-    w.user?.name?.toLowerCase().includes(search.toLowerCase()) ||
+  const filtered = withdrawals.filter(w =>
+    (w.user?.name?.toLowerCase().includes(search.toLowerCase()) ?? false) ||
     w._id.toLowerCase().includes(search.toLowerCase())
   );
 

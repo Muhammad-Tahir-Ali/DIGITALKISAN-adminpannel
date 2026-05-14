@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import api from '../../lib/api';
 import {
@@ -65,7 +65,11 @@ export default function AdminLayout({ children }: LayoutProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const notificationRef = useRef<HTMLDivElement>(null);
   const currentTitle = ROUTE_TITLES[location.pathname] || 'Admin';
+  const adminUser = authService.getUser();
+  const adminName = adminUser?.name || 'Admin';
+  const adminInitial = adminName[0]?.toUpperCase() || 'A';
 
   const fetchNotifications = async () => {
     try {
@@ -77,10 +81,22 @@ export default function AdminLayout({ children }: LayoutProps) {
   };
 
   useEffect(() => {
-    setTimeout(() => fetchNotifications(), 0);
-    const interval = setInterval(fetchNotifications, 60000); // Polling every minute
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 60000);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (notificationRef.current && !notificationRef.current.contains(e.target as Node)) {
+        setShowNotifications(false);
+      }
+    };
+    if (showNotifications) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showNotifications]);
 
   const markAsRead = async (id: string) => {
     try {
@@ -146,10 +162,10 @@ export default function AdminLayout({ children }: LayoutProps) {
         <div className="p-4 border-t border-zinc-900">
           <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-zinc-800/60 transition-colors group mb-2 cursor-pointer">
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white text-xs font-black flex-shrink-0">
-              A
+              {adminInitial}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-zinc-300 text-sm font-semibold truncate leading-tight">Admin User</p>
+              <p className="text-zinc-300 text-sm font-semibold truncate leading-tight">{adminName}</p>
               <p className="text-zinc-600 text-[10px] font-medium truncate">Super Administrator</p>
             </div>
             <Settings className="w-4 h-4 text-zinc-600 group-hover:text-zinc-400 flex-shrink-0 transition-colors" />
@@ -199,8 +215,8 @@ export default function AdminLayout({ children }: LayoutProps) {
               </div>
             )}
 
-            <div className="relative">
-              <button 
+            <div className="relative" ref={notificationRef}>
+              <button
                 onClick={() => setShowNotifications(!showNotifications)}
                 className={`w-9 h-9 flex items-center justify-center rounded-xl transition-all relative ${
                   showNotifications ? 'bg-emerald-50 text-emerald-600' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
@@ -251,11 +267,11 @@ export default function AdminLayout({ children }: LayoutProps) {
             {/* Avatar */}
             <div className="flex items-center gap-2.5">
               <div className="text-right">
-                <p className="text-sm font-bold text-slate-900 leading-tight">Admin</p>
+                <p className="text-sm font-bold text-slate-900 leading-tight">{adminName}</p>
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Super Admin</p>
               </div>
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white text-sm font-black shadow-md shadow-emerald-500/20">
-                A
+                {adminInitial}
               </div>
             </div>
           </div>

@@ -42,8 +42,8 @@ export default function Deposits() {
     }
   };
 
-  const filtered = deposits.filter(d => 
-    d.user?.name?.toLowerCase().includes(search.toLowerCase()) ||
+  const filtered = deposits.filter(d =>
+    (d.user?.name?.toLowerCase().includes(search.toLowerCase()) ?? false) ||
     d._id.toLowerCase().includes(search.toLowerCase())
   );
 

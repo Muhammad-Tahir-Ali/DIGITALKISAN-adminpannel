@@ -33,9 +33,9 @@ export default function Disputes() {
       const q = search.toLowerCase();
       const matchesSearch =
         d._id.toLowerCase().includes(q) ||
-        d.buyer?.name.toLowerCase().includes(q) ||
-        d.farmer?.name.toLowerCase().includes(q) ||
-        d.product?.title.toLowerCase().includes(q);
+        (d.buyer?.name?.toLowerCase().includes(q) ?? false) ||
+        (d.farmer?.name?.toLowerCase().includes(q) ?? false) ||
+        (d.product?.title?.toLowerCase().includes(q) ?? false);
       return matchesSearch;
     });
   }, [disputes, search]);

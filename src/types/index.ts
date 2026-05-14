@@ -25,6 +25,7 @@ export interface Dispute {
   buyer?: { name: string };
   farmer?: { name: string };
   product?: { title: string };
+  totalPrice: number;
   reason?: string;
   status: string;
   createdAt: string;
@@ -37,6 +38,7 @@ export interface Order {
   farmer?: { name: string };
   product?: { title: string };
   totalPrice?: number;
+  quantity?: number;
   status: string;
   createdAt: string;
   [key: string]: unknown;
@@ -46,18 +48,23 @@ export interface Product {
   _id: string;
   title: string;
   farmer?: { name: string };
-  price: number;
-  stock: number;
+  pricePerUnit: number;
+  availableQuantity: number;
+  unit: string;
+  category: string;
   status: string;
   createdAt: string;
   [key: string]: unknown;
 }
 
-export interface Transaction {
+export interface WalletTransaction {
   _id: string;
-  user?: { name: string };
+  user?: { _id: string; name: string };
   amount: number;
+  direction: 'credit' | 'debit';
   type: string;
+  description?: string;
+  balanceAfter?: number;
   status: string;
   createdAt: string;
   [key: string]: unknown;

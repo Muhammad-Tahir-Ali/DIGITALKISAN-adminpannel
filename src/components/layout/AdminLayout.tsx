@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import api from '../../lib/api';
 import {
@@ -17,8 +17,6 @@ import {
   Package,
   ShoppingBag,
   ShieldCheck,
-  PlusCircle,
-  ArrowUpRight,
 } from 'lucide-react';
 import { authService } from '../../lib/auth';
 
@@ -33,43 +31,26 @@ const navItems = [
   { name: 'Orders', icon: ShoppingBag, path: '/orders', description: 'Customer purchases' },
   { name: 'Verification', icon: ShieldCheck, path: '/verification', description: 'Farmer approvals' },
   { name: 'Transactions', icon: ArrowLeftRight, path: '/transactions', description: 'Financial monitoring' },
-  { name: 'Deposits', icon: PlusCircle, path: '/deposits', description: 'Top-up approvals' },
-  { name: 'Withdrawals', icon: ArrowUpRight, path: '/withdrawals', description: 'Payout management' },
   { name: 'Disputes', icon: AlertCircle, path: '/disputes', description: 'Conflict resolution' },
   { name: 'Analytics', icon: BarChart3, path: '/analytics', description: 'Performance insights' },
 ];
 
 const ROUTE_TITLES: Record<string, string> = {
-  '/dashboard':    'Dashboard',
-  '/users':        'User Management',
-  '/products':     'Product Inventory',
-  '/orders':       'Order Monitoring',
+  '/dashboard': 'Dashboard',
+  '/users': 'User Management',
   '/verification': 'Farmer Verification',
   '/transactions': 'Financial Monitoring',
-  '/deposits':     'Wallet Deposits',
-  '/withdrawals':  'Payout Management',
-  '/disputes':     'Dispute Resolution',
-  '/analytics':    'Platform Analytics',
+  '/disputes': 'Dispute Resolution',
+  '/analytics': 'Platform Analytics',
 };
-
-interface Notification {
-  _id: string;
-  message: string;
-  isRead: boolean;
-  createdAt: string;
-}
 
 export default function AdminLayout({ children }: LayoutProps) {
   const location = useLocation();
   const [searching, setSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const notificationRef = useRef<HTMLDivElement>(null);
+  const [notifications, setNotifications] = useState<any[]>([]);
   const currentTitle = ROUTE_TITLES[location.pathname] || 'Admin';
-  const adminUser = authService.getUser();
-  const adminName = adminUser?.name || 'Admin';
-  const adminInitial = adminName[0]?.toUpperCase() || 'A';
 
   const fetchNotifications = async () => {
     try {
@@ -82,21 +63,9 @@ export default function AdminLayout({ children }: LayoutProps) {
 
   useEffect(() => {
     fetchNotifications();
-    const interval = setInterval(fetchNotifications, 60000);
+    const interval = setInterval(fetchNotifications, 60000); // Polling every minute
     return () => clearInterval(interval);
   }, []);
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (notificationRef.current && !notificationRef.current.contains(e.target as Node)) {
-        setShowNotifications(false);
-      }
-    };
-    if (showNotifications) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showNotifications]);
 
   const markAsRead = async (id: string) => {
     try {
@@ -133,10 +102,9 @@ export default function AdminLayout({ children }: LayoutProps) {
               key={item.path}
               to={item.path}
               className={({ isActive }) =>
-                `relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 group ${
-                  isActive
-                    ? 'bg-emerald-500/10 text-emerald-400'
-                    : 'text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/60'
+                `relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 group ${isActive
+                  ? 'bg-emerald-500/10 text-emerald-400'
+                  : 'text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/60'
                 }`
               }
             >
@@ -162,10 +130,10 @@ export default function AdminLayout({ children }: LayoutProps) {
         <div className="p-4 border-t border-zinc-900">
           <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-zinc-800/60 transition-colors group mb-2 cursor-pointer">
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white text-xs font-black flex-shrink-0">
-              {adminInitial}
+              A
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-zinc-300 text-sm font-semibold truncate leading-tight">{adminName}</p>
+              <p className="text-zinc-300 text-sm font-semibold truncate leading-tight">Admin User</p>
               <p className="text-zinc-600 text-[10px] font-medium truncate">Super Administrator</p>
             </div>
             <Settings className="w-4 h-4 text-zinc-600 group-hover:text-zinc-400 flex-shrink-0 transition-colors" />
@@ -215,12 +183,11 @@ export default function AdminLayout({ children }: LayoutProps) {
               </div>
             )}
 
-            <div className="relative" ref={notificationRef}>
+            <div className="relative">
               <button
                 onClick={() => setShowNotifications(!showNotifications)}
-                className={`w-9 h-9 flex items-center justify-center rounded-xl transition-all relative ${
-                  showNotifications ? 'bg-emerald-50 text-emerald-600' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
-                }`}
+                className={`w-9 h-9 flex items-center justify-center rounded-xl transition-all relative ${showNotifications ? 'bg-emerald-50 text-emerald-600' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
+                  }`}
               >
                 <Bell className="w-4.5 h-4.5" style={{ width: 18, height: 18 }} />
                 {unreadCount > 0 && (
@@ -243,8 +210,8 @@ export default function AdminLayout({ children }: LayoutProps) {
                       </div>
                     ) : (
                       notifications.map((n) => (
-                        <div 
-                          key={n._id} 
+                        <div
+                          key={n._id}
                           onClick={() => !n.isRead && markAsRead(n._id)}
                           className={`px-4 py-3 hover:bg-slate-50 transition-colors cursor-pointer border-b border-slate-50 last:border-0 ${!n.isRead ? 'bg-emerald-50/30' : ''}`}
                         >
@@ -267,11 +234,11 @@ export default function AdminLayout({ children }: LayoutProps) {
             {/* Avatar */}
             <div className="flex items-center gap-2.5">
               <div className="text-right">
-                <p className="text-sm font-bold text-slate-900 leading-tight">{adminName}</p>
+                <p className="text-sm font-bold text-slate-900 leading-tight">Admin</p>
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Super Admin</p>
               </div>
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white text-sm font-black shadow-md shadow-emerald-500/20">
-                {adminInitial}
+                A
               </div>
             </div>
           </div>

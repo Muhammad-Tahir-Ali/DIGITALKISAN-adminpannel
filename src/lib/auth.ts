@@ -14,10 +14,11 @@ export const authService = {
       localStorage.setItem('dk_admin_token', token);
       localStorage.setItem('dk_admin_user', JSON.stringify(data.user));
       return { success: true };
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
       return { 
         success: false, 
-        message: error.response?.data?.message || 'Login failed' 
+        message: err.response?.data?.message || 'Login failed' 
       };
     }
   },

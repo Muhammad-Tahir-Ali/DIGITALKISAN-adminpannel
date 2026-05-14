@@ -25,7 +25,7 @@ export default function Transactions() {
   };
 
   useEffect(() => {
-    fetchOrders();
+    setTimeout(() => fetchOrders(), 0);
   }, []);
 
   const filtered = useMemo(() => {

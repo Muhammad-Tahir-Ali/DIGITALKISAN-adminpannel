@@ -1,38 +1,41 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Search, Trash2, Loader2, AlertTriangle, RefreshCcw, Package } from 'lucide-react';
 import api from '../lib/api';
+import { Product } from '../types';
 
 export default function Products() {
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
 
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       const res = await api.get('/admin/products', { params: { search, category } });
       setProducts(res.data.data.products);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to fetch products');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || 'Failed to fetch products');
     } finally {
       setLoading(false);
     }
-  };
+  }, [search, category]);
 
   useEffect(() => {
     const timer = setTimeout(fetchProducts, 500);
     return () => clearTimeout(timer);
-  }, [search, category]);
+  }, [fetchProducts]);
 
   const updateStatus = async (id: string, status: string) => {
     try {
       await api.patch(`/admin/products/${id}/status`, { status });
       setProducts(prev => prev.map(p => p._id === id ? { ...p, status } : p));
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to update status');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      alert(error.response?.data?.message || 'Failed to update status');
     }
   };
 
@@ -41,8 +44,9 @@ export default function Products() {
     try {
       await api.delete(`/admin/products/${id}`);
       setProducts(prev => prev.filter(p => p._id !== id));
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to delete product');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      alert(error.response?.data?.message || 'Failed to delete product');
     }
   };
 

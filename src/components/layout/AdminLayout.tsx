@@ -40,22 +40,31 @@ const navItems = [
 ];
 
 const ROUTE_TITLES: Record<string, string> = {
-  '/dashboard': 'Dashboard',
-  '/users': 'User Management',
+  '/dashboard':    'Dashboard',
+  '/users':        'User Management',
+  '/products':     'Product Inventory',
+  '/orders':       'Order Monitoring',
   '/verification': 'Farmer Verification',
   '/transactions': 'Financial Monitoring',
-  '/deposits': 'Wallet Deposits',
-  '/withdrawals': 'Payout Management',
-  '/disputes': 'Dispute Resolution',
-  '/analytics': 'Platform Analytics',
+  '/deposits':     'Wallet Deposits',
+  '/withdrawals':  'Payout Management',
+  '/disputes':     'Dispute Resolution',
+  '/analytics':    'Platform Analytics',
 };
+
+interface Notification {
+  _id: string;
+  message: string;
+  isRead: boolean;
+  createdAt: string;
+}
 
 export default function AdminLayout({ children }: LayoutProps) {
   const location = useLocation();
   const [searching, setSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
-  const [notifications, setNotifications] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const currentTitle = ROUTE_TITLES[location.pathname] || 'Admin';
 
   const fetchNotifications = async () => {
@@ -68,7 +77,7 @@ export default function AdminLayout({ children }: LayoutProps) {
   };
 
   useEffect(() => {
-    fetchNotifications();
+    setTimeout(() => fetchNotifications(), 0);
     const interval = setInterval(fetchNotifications, 60000); // Polling every minute
     return () => clearInterval(interval);
   }, []);

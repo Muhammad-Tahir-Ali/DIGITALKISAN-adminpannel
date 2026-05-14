@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
-import { Loader2, AlertTriangle, RefreshCcw, User, ExternalLink } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Loader2, AlertTriangle, User, ExternalLink } from 'lucide-react';
 import api from '../lib/api';
+import { Order } from '../types';
 
-const statusColors: any = {
+const statusColors: Record<string, string> = {
   pending: 'bg-amber-100 text-amber-700',
   paid: 'bg-blue-100 text-blue-700',
   bidding: 'bg-violet-100 text-violet-700',
@@ -13,34 +14,37 @@ const statusColors: any = {
 };
 
 export default function Orders() {
-  const [orders, setOrders] = useState<any[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState('');
 
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       const res = await api.get('/admin/orders', { params: { status } });
       setOrders(res.data.data.orders);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to fetch orders');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || 'Failed to fetch orders');
     } finally {
       setLoading(false);
     }
-  };
+  }, [status]);
 
   useEffect(() => {
-    fetchOrders();
-  }, [status]);
+    const timer = setTimeout(() => fetchOrders(), 0);
+    return () => clearTimeout(timer);
+  }, [fetchOrders]);
 
   const updateStatus = async (id: string, newStatus: string) => {
     try {
       await api.patch(`/admin/orders/${id}/status`, { status: newStatus });
       setOrders(prev => prev.map(o => o._id === id ? { ...o, status: newStatus } : o));
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to update order status');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      alert(error.response?.data?.message || 'Failed to update order status');
     }
   };
 

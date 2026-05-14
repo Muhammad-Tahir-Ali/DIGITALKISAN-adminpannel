@@ -6,12 +6,32 @@ import {
 import { AlertTriangle, RefreshCcw, Loader2 } from 'lucide-react';
 import api from '../lib/api';
 
-const CUSTOM_TOOLTIP = ({ active, payload, label }: any) => {
+interface AnalyticsData {
+  dailyRevenue: { date: string; revenue: number }[];
+  userGrowth: { date: string; count: number }[];
+  topFarmers: { name: string; totalSales: number; rating: number }[];
+  topProducts: { title: string; totalOrders: number; revenue: number }[];
+  categoryBreakdown: { category: string; count: number; revenue: number }[];
+}
+
+interface TooltipPayload {
+  color: string;
+  name: string;
+  value: number | string;
+}
+
+interface TooltipProps {
+  active?: boolean;
+  payload?: TooltipPayload[];
+  label?: string;
+}
+
+const CUSTOM_TOOLTIP = ({ active, payload, label }: TooltipProps) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-white border border-zinc-200 rounded-2xl p-4 shadow-xl text-sm">
         <p className="font-black text-zinc-900 mb-2">{label}</p>
-        {payload.map((p: any, i: number) => (
+        {payload.map((p: TooltipPayload, i: number) => (
           <p key={i} style={{ color: p.color }} className="font-bold">
             {p.name}: {typeof p.value === 'number' ? `₨ ${p.value.toLocaleString()}` : p.value}
           </p>
@@ -25,7 +45,7 @@ const CUSTOM_TOOLTIP = ({ active, payload, label }: any) => {
 const COLORS = ['#f59e0b', '#10b981', '#f97316', '#6366f1', '#ec4899', '#8b5cf6'];
 
 export default function Analytics() {
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,18 +55,19 @@ export default function Analytics() {
       setError(null);
       const res = await api.get('/admin/analytics');
       setData(res.data.data);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to fetch analytics');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || 'Failed to fetch analytics');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchAnalytics();
+    setTimeout(() => fetchAnalytics(), 0);
   }, []);
 
-  if (loading) {
+  if (loading || !data) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <Loader2 className="w-10 h-10 text-emerald-500 animate-spin" />
@@ -127,7 +148,7 @@ export default function Analytics() {
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-50">
-              {topFarmers.map((f: any, i: number) => (
+              {topFarmers.map((f: { name: string; totalSales: number; rating: number }, i: number) => (
                 <tr key={i} className="hover:bg-zinc-50/30">
                   <td className="px-8 py-4 font-bold text-zinc-900 text-sm">{f.name}</td>
                   <td className="px-8 py-4 font-black text-emerald-600 text-sm">₨ {f.totalSales.toLocaleString()}</td>
@@ -149,7 +170,7 @@ export default function Analytics() {
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-50">
-              {topProducts.map((p: any, i: number) => (
+              {topProducts.map((p: { title: string; totalOrders: number; revenue: number }, i: number) => (
                 <tr key={i} className="hover:bg-zinc-50/30">
                   <td className="px-8 py-4 font-bold text-zinc-900 text-sm">{p.title}</td>
                   <td className="px-8 py-4 font-bold text-zinc-600 text-sm">{p.totalOrders}</td>
@@ -170,16 +191,16 @@ export default function Analytics() {
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie data={categoryBreakdown} cx="50%" cy="50%" innerRadius={60} outerRadius={100} paddingAngle={5} dataKey="revenue" nameKey="category">
-                  {categoryBreakdown.map((_: any, index: number) => (
+                  {categoryBreakdown.map((_: unknown, index: number) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip formatter={(value: any) => [`₨ ${value.toLocaleString()}`, 'Revenue']} />
+                <Tooltip formatter={(value: number | string) => [`₨ ${value.toLocaleString()}`, 'Revenue']} />
               </PieChart>
             </ResponsiveContainer>
           </div>
           <div className="space-y-4">
-            {categoryBreakdown.map((item: any, i: number) => (
+            {categoryBreakdown.map((item: { category: string; revenue: number; count: number }, i: number) => (
               <div key={i} className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/10">
                 <div className="flex items-center gap-3">
                   <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />

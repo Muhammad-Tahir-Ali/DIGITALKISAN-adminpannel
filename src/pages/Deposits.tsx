@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Check, X, Search, Clock, ShieldCheck, AlertCircle, Loader2 } from 'lucide-react';
 import api from '../lib/api';
+import type { Deposit } from '../types';
 
 export default function Deposits() {
-  const [deposits, setDeposits] = useState<any[]>([]);
+  const [deposits, setDeposits] = useState<Deposit[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -14,15 +15,16 @@ export default function Deposits() {
       setLoading(true);
       const res = await api.get('/admin/deposits');
       setDeposits(res.data.data.deposits);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to fetch deposits');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || 'Failed to fetch deposits');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchDeposits();
+    setTimeout(() => fetchDeposits(), 0);
   }, []);
 
   const handleUpdateStatus = async (id: string, status: 'approved' | 'rejected') => {
@@ -32,8 +34,9 @@ export default function Deposits() {
     try {
       await api.patch(`/admin/deposits/${id}`, { status });
       setDeposits(prev => prev.map(d => d._id === id ? { ...d, status } : d));
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to update status');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      alert(error.response?.data?.message || 'Failed to update status');
     } finally {
       setProcessing(null);
     }

@@ -1,36 +1,34 @@
 import React, { useEffect, useState } from 'react';
 import {
-  AreaChart, Area, BarChart, Bar, XAxis, YAxis,
-  CartesianGrid, Tooltip, ResponsiveContainer,
-} from 'recharts';
-import {
   TrendingUp, Users, Package, AlertTriangle,
-  ArrowUpRight, ArrowDownRight, CheckCircle2, Clock,
-  DollarSign, ShieldCheck, RefreshCcw
+  Clock, DollarSign, RefreshCcw
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../lib/api';
 
-const CustomTooltip = ({ active, payload, label }: any) => {
-  if (!active || !payload?.length) return null;
-  return (
-    <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xl text-sm">
-      <p className="font-black text-slate-900 mb-1.5">{label}</p>
-      {payload.map((p: any, i: number) => (
-        <p key={i} style={{ color: p.stroke || p.fill }} className="font-semibold">
-          {p.name}: {typeof p.value === 'number' ? `₨ ${p.value.toLocaleString()}` : p.value}
-        </p>
-      ))}
-    </div>
-  );
-};
+interface RecentActivityOrder {
+  _id: string;
+  buyer?: { name: string };
+  farmer?: { name: string };
+  product?: { title: string };
+  totalPrice?: number;
+  status: string;
+  createdAt: string;
+}
 
-const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+interface DashboardData {
+  recentActivity?: RecentActivityOrder[];
+  totalRevenue?: number;
+  platformFees?: number;
+  totalOrders?: number;
+  totalUsers?: number;
+  ordersByStatus?: Record<string, number>;
+}
 
 export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<DashboardData | null>(null);
 
   const fetchDashboard = async () => {
     try {
@@ -38,18 +36,19 @@ export default function Dashboard() {
       setError(null);
       const response = await api.get('/admin/stats');
       setData(response.data.data);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to fetch dashboard stats');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || 'Failed to fetch dashboard stats');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchDashboard();
+    setTimeout(() => fetchDashboard(), 0);
   }, []);
 
-  if (loading) {
+  if (loading || !data) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
@@ -178,7 +177,7 @@ export default function Dashboard() {
                   <td colSpan={7} className="px-6 py-10 text-center text-slate-400 font-medium">No recent activity found</td>
                 </tr>
               ) : (
-                recentActivity.map((order: any) => (
+                recentActivity.map((order: RecentActivityOrder) => (
                   <tr key={order._id} className="hover:bg-slate-50/50 transition-colors">
                     <td className="px-6 py-4 text-xs font-black text-slate-400 italic">#{order._id.slice(-6)}</td>
                     <td className="px-6 py-4 text-sm font-bold text-slate-900">{order.buyer?.name || 'Unknown'}</td>

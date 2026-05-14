@@ -22,7 +22,7 @@ export default function Withdrawals() {
   };
 
   useEffect(() => {
-    fetchWithdrawals();
+    setTimeout(() => fetchWithdrawals(), 0);
   }, []);
 
   const handleUpdateStatus = async (id: string, status: 'approved' | 'rejected' | 'processed') => {

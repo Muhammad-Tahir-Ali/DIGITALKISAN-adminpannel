@@ -1,13 +1,14 @@
 import { useState, useEffect, useMemo } from 'react';
 import { AlertTriangle, Search, ExternalLink, RefreshCcw } from 'lucide-react';
 import api from '../lib/api';
+import type { Dispute } from '../types';
 
 export default function Disputes() {
-  const [disputes, setDisputes] = useState<any[]>([]);
+  const [disputes, setDisputes] = useState<Dispute[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
-  const [selected, setSelected] = useState<any | null>(null);
+  const [selected, setSelected] = useState<Dispute | null>(null);
 
   const fetchDisputes = async () => {
     try {
@@ -15,15 +16,16 @@ export default function Disputes() {
       setError(null);
       const response = await api.get('/admin/disputes');
       setDisputes(response.data.data.disputes);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to fetch disputes');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || 'Failed to fetch disputes');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchDisputes();
+    setTimeout(() => fetchDisputes(), 0);
   }, []);
 
   const filtered = useMemo(() => {
@@ -45,8 +47,9 @@ export default function Disputes() {
       setDisputes(prev => prev.filter(d => d._id !== id));
       setSelected(null);
       alert('Dispute resolved successfully.');
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to resolve dispute');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      alert(error.response?.data?.message || 'Failed to resolve dispute');
     }
   };
 

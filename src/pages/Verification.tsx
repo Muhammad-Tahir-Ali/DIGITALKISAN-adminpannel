@@ -27,7 +27,7 @@ export default function Verification() {
   };
 
   useEffect(() => {
-    fetchUsers();
+    setTimeout(() => fetchUsers(), 0);
   }, []);
 
   const filteredUsers = useMemo(() => {

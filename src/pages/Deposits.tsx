@@ -24,7 +24,7 @@ export default function Deposits() {
   };
 
   useEffect(() => {
-    setTimeout(() => fetchDeposits(), 0);
+    fetchDeposits();
   }, []);
 
   const handleUpdateStatus = async (id: string, status: 'approved' | 'rejected') => {
@@ -45,6 +45,15 @@ export default function Deposits() {
   const filtered = deposits.filter(d =>
     (d.user?.name?.toLowerCase().includes(search.toLowerCase()) ?? false) ||
     d._id.toLowerCase().includes(search.toLowerCase())
+  );
+
+  if (error && !deposits.length) return (
+    <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
+      <AlertCircle className="w-12 h-12 text-rose-500 mb-4" />
+      <h2 className="text-xl font-bold text-slate-900">Fetch Error</h2>
+      <p className="text-slate-500 mt-1">{error}</p>
+      <button onClick={fetchDeposits} className="mt-6 flex items-center gap-2 px-6 py-2.5 bg-zinc-900 text-white rounded-xl font-bold">Retry</button>
+    </div>
   );
 
   if (loading) return (

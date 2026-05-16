@@ -61,6 +61,14 @@ export default function Transactions() {
     { id: 'debit', label: 'Debits' },
   ];
 
+  const escapeCSV = (val: unknown): string => {
+    const str = String(val ?? '');
+    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+      return `"${str.replace(/"/g, '""')}"`;
+    }
+    return str;
+  };
+
   const handleExport = () => {
     const csv = [
       ['ID', 'User', 'Type', 'Description', 'Direction', 'Amount', 'Balance After', 'Status', 'Date'],
@@ -75,7 +83,7 @@ export default function Transactions() {
         t.status,
         new Date(t.createdAt).toLocaleDateString(),
       ]),
-    ].map(r => r.join(',')).join('\n');
+    ].map(r => r.map(escapeCSV).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');

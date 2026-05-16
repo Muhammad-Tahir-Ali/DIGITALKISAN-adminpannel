@@ -30,7 +30,19 @@ export const authService = {
   },
 
   isAuthenticated: () => {
-    return !!localStorage.getItem('dk_admin_token');
+    const token = localStorage.getItem('dk_admin_token');
+    if (!token) return false;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      if (payload.exp && payload.exp * 1000 < Date.now()) {
+        localStorage.removeItem('dk_admin_token');
+        localStorage.removeItem('dk_admin_user');
+        return false;
+      }
+      return true;
+    } catch {
+      return false;
+    }
   },
 
   getUser: () => {

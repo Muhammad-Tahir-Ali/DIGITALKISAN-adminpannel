@@ -76,7 +76,9 @@ export default function Users() {
     return () => clearTimeout(timer);
   }, [fetchUsers]);
 
-  const toggleVerify = async (id: string) => {
+  const toggleVerify = async (id: string, current: boolean) => {
+    const action = current ? 'unverify' : 'verify';
+    if (!window.confirm(`Are you sure you want to ${action} this user?`)) return;
     try {
       const res = await api.patch(`/admin/users/${id}/verify`);
       setUsers(prev => prev.map(u => u._id === id ? res.data.data.user : u));
@@ -224,8 +226,8 @@ export default function Users() {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <button 
-                        onClick={() => toggleVerify(user._id)}
+                      <button
+                        onClick={() => toggleVerify(user._id, user.isVerified)}
                         className={`flex items-center gap-1.5 text-[11px] font-bold transition-colors ${user.isVerified ? 'text-emerald-600 hover:text-emerald-700' : 'text-amber-500 hover:text-amber-600'}`}
                       >
                         {user.isVerified ? <ShieldCheck className="w-4 h-4" /> : <Clock className="w-4 h-4" />}

@@ -25,7 +25,7 @@ export default function Disputes() {
   };
 
   useEffect(() => {
-    setTimeout(() => fetchDisputes(), 0);
+    fetchDisputes();
   }, []);
 
   const filtered = useMemo(() => {
@@ -53,14 +53,6 @@ export default function Disputes() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
-      </div>
-    );
-  }
-
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
@@ -68,6 +60,14 @@ export default function Disputes() {
         <h2 className="text-xl font-bold text-slate-900">Fetch Error</h2>
         <p className="text-slate-500 mt-1">{error}</p>
         <button onClick={fetchDisputes} className="mt-6 flex items-center gap-2 px-6 py-2.5 bg-zinc-900 text-white rounded-xl font-bold"><RefreshCcw className="w-4 h-4" /> Retry</button>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
       </div>
     );
   }

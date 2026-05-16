@@ -64,7 +64,7 @@ export default function Analytics() {
   };
 
   useEffect(() => {
-    setTimeout(() => fetchAnalytics(), 0);
+    fetchAnalytics();
   }, []);
 
   if (error) {

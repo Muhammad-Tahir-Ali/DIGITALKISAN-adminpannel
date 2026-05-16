@@ -19,6 +19,12 @@ const ProtectedRoute = () => {
     return <Navigate to="/login" replace />;
   }
 
+  const user = authService.getUser();
+  if (user && user.role !== 'admin') {
+    authService.logout();
+    return <Navigate to="/login" replace />;
+  }
+
   return (
     <AdminLayout>
       <Outlet />

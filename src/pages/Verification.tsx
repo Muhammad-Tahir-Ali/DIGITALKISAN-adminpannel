@@ -38,7 +38,7 @@ export default function Verification() {
   };
 
   useEffect(() => {
-    setTimeout(() => fetchUsers(), 0);
+    fetchUsers();
   }, []);
 
   const filteredUsers = useMemo(() => {
@@ -66,14 +66,6 @@ export default function Verification() {
     }
     };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="w-10 h-10 text-emerald-500 animate-spin" />
-      </div>
-    );
-  }
-
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
@@ -81,6 +73,14 @@ export default function Verification() {
         <h2 className="text-xl font-bold text-slate-900">Fetch Error</h2>
         <p className="text-slate-500 mt-1">{error}</p>
         <button onClick={fetchUsers} className="mt-6 flex items-center gap-2 px-6 py-2.5 bg-zinc-900 text-white rounded-xl font-bold">Retry</button>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-10 h-10 text-emerald-500 animate-spin" />
       </div>
     );
   }

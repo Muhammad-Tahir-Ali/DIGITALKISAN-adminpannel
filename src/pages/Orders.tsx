@@ -34,8 +34,7 @@ export default function Orders() {
   }, [status]);
 
   useEffect(() => {
-    const timer = setTimeout(() => fetchOrders(), 0);
-    return () => clearTimeout(timer);
+    fetchOrders();
   }, [fetchOrders]);
 
   const updateStatus = async (id: string, newStatus: string) => {
@@ -130,9 +129,6 @@ export default function Orders() {
                       </select>
                     </td>
                     <td className="px-8 py-5 text-right">
-                      <span className="text-[10px] font-bold text-zinc-300 italic">
-                        {new Date(order.createdAt).toLocaleDateString('en-PK')}
-                      </span>
                     </td>
                   </tr>
                 ))
